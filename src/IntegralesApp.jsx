@@ -1,11 +1,8 @@
 import {AppRoutes} from "./routes/AppRoutes.jsx";
-export const CanvasApp = () => {
+export const IntegralesApp = () => {
     return (
         <>
-
-
             <AppRoutes/>
-
         </>
     )
 }

@@ -1,37 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
-import { toast, ToastContainer } from 'react-toastify';
+import {useState, useEffect} from 'react';
+import {Container, Row, Col, Button} from 'react-bootstrap';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
+import problemas from "../../services/IntegralSustitucionProblemas.js";
+import {shuffleArray} from "../../services/Services.js";
 
-const shuffleArray = (array) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
+const problems = problemas;
+
+const nivelColors = {
+    Facil: 'green',
+    Intermedio: 'orange',
+    Dificil: 'red',
 };
-
-const problems = [
-    [
-        {
-            problemImage: 'public/images/img_1.png',
-            options: ['public/images/img_2.png', 'public/images/img_3.png', 'public/images/img_4.png'],
-            correctOption: 1,
-            consejo: 'Paso1: Recuerda revisar cuidadosamente el problema y calcular las opciones posibles en este paso.',
-        },
-        {
-            problemImage: 'public/images/img_1.png',
-            options: ['public/images/img_5.png', 'public/images/img_6.png', 'public/images/img_4.png'],
-            correctOption: 2,
-            consejo: 'Paso2: Para este paso, considera las propiedades matemáticas relevantes.',
-        },
-    ],
-    // Otros ejercicios pueden ir aquí
-];
-
-export const IntegralBasicaResolver = () => {
+export const IntegralSustitucionResolver = () => {
     const [userProgress, setUserProgress] = useState({
         currentProblemIndex: 0,
         currentStep: 0,
@@ -49,7 +31,11 @@ export const IntegralBasicaResolver = () => {
     useEffect(() => {
         const currentProblem = problems[userProgress.currentProblemIndex];
         if (currentProblem && currentProblem[userProgress.currentStep]) {
-            setShuffledOptions(shuffleArray(currentProblem[userProgress.currentStep].options));
+            const shuffled = shuffleArray([
+                currentProblem[userProgress.currentStep].correctOption,
+                ...currentProblem[userProgress.currentStep].incorrectOptions
+            ]);
+            setShuffledOptions(shuffled);
         }
     }, [userProgress]);
 
@@ -57,15 +43,17 @@ export const IntegralBasicaResolver = () => {
     const currentStepData = currentProblem && currentProblem[userProgress.currentStep];
     const options = shuffledOptions;
 
-    const handleOptionClick = (index) => {
+    const handleOptionClick = (selectedOption) => {
         if (!selectionMade) {
-            if (currentStepData && index === currentStepData.correctOption) {
+            if (currentStepData && selectedOption === currentStepData.correctOption) {
                 // Respuesta correcta
                 toast.success('¡Respuesta correcta!', {
                     position: 'top-right',
                     autoClose: 2000,
                 });
-                setCorrectAnswersHistory([...correctAnswersHistory, currentStepData.options[index]]);
+
+                // Almacenar tanto la imagen de la respuesta correcta como la imagen del problema
+                setCorrectAnswersHistory([...correctAnswersHistory, currentStepData.problemImage, selectedOption]);
 
                 // Mostrar el botón "Siguiente Paso" solo después de una respuesta correcta
                 setShowNextStepButton(true);
@@ -94,7 +82,8 @@ export const IntegralBasicaResolver = () => {
         setConsejoVisible(false);
         setCurrentConsejo('');
         setSelectionMade(false);
-        setShowResetButton(false); // Ocultar el botón de reinicio
+        setShowResetButton(false);
+
 
         if (userProgress.currentStep < currentProblem.length - 1) {
             setUserProgress({
@@ -103,16 +92,36 @@ export const IntegralBasicaResolver = () => {
             });
         } else {
             if (userProgress.currentProblemIndex < problems.length - 1) {
-                setUserProgress({
-                    currentProblemIndex: userProgress.currentProblemIndex + 1,
-                    currentStep: 0,
-                });
-            } else {
+                // Si hay más ejercicios en la lista, muestra "Siguiente Ejercicio"
                 Swal.fire({
                     icon: 'success',
                     title: 'Felicitaciones',
                     text: 'Has completado el ejercicio correctamente.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Siguiente Ejercicio',
+                    cancelButtonText: 'Menu Principal',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        setCorrectAnswersHistory([]);
+                        setUserProgress({
+
+                            currentProblemIndex: userProgress.currentProblemIndex + 1,
+                            currentStep: 0,
+                        });
+                    } else {
+                        // Redirigir a la página de inicio
+                        window.location.href = '/';
+                    }
+                });
+            } else {
+                // Si es el último ejercicio en la lista, muestra "Regresar a Home"
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Felicitaciones',
+                    text: 'Has completado todos los ejercicios correctamente.',
+                    confirmButtonText: 'Ok',
                 }).then(() => {
+                    // Redirigir a la página de inicio
                     window.location.href = '/';
                 });
             }
@@ -120,38 +129,54 @@ export const IntegralBasicaResolver = () => {
     };
 
     const handleResetClick = () => {
-        // Reiniciar el progreso del usuario
         setUserProgress({
-            currentProblemIndex: 0,
+            currentProblemIndex: userProgress.currentProblemIndex,
             currentStep: 0,
             completed: false,
         });
 
-        // Limpiar historial de respuestas y consejos
         setCorrectAnswersHistory([]);
         setConsejoVisible(false);
         setCurrentConsejo('');
 
-        // Desbloquear las opciones
         setOptionsDisabled(false);
         setSelectionMade(false);
-
-        // Ocultar el botón de reinicio
         setShowResetButton(false);
     };
+
+    const nivelActual = currentProblem[userProgress.currentProblemIndex]?.nivel;
+    const colorNivel = nivelColors[nivelActual] || 'black';
 
     return (
         <div>
             <Container>
                 <Row>
-                    <h1 style={{ marginBottom: '20px', color: 'white' }}>
-                        Ejercicio {userProgress.currentProblemIndex + 1} de {problems.length}
+
+                    <h1 style={{
+                        marginBottom: '20px',
+                        color: 'white',
+                        backgroundColor: '#132043',
+                        borderRadius: '15px',
+                        padding: '10px',
+                        boxShadow: '0 0 10px #ccc',
+                    }}>
+                        Ejercicio {userProgress.currentProblemIndex + 1} de {problems.length}{' '}
+                        <h3 style={{display: 'inline-block', marginLeft: '400px'}}>
+                            Nivel : {' '}
+                            {currentProblem && currentProblem[userProgress.currentProblemIndex] && (
+                                <span style={{color: colorNivel}}>
+        {nivelActual}
+      </span>
+                            )}
+                        </h3>
                     </h1>
+
+
                     <Col md={6}>
                         <div
                             style={{
                                 display: 'flex',
-                                flexDirection: 'row',
+                                flexDirection: 'column', // Cambiar la dirección de la disposición a vertical
                                 alignItems: 'center',
                                 backgroundColor: '#132043',
                                 borderRadius: '15px',
@@ -164,8 +189,8 @@ export const IntegralBasicaResolver = () => {
                                     src={currentStepData.problemImage}
                                     alt="Problema"
                                     style={{
-                                        width: '100%',
-                                        maxWidth: '200px',
+                                        width: '70%',
+                                        height: 'auto', // Cambiar la altura a automático para que se ajuste proporcionalmente
                                         border: '2px solid #ccc',
                                         borderRadius: '8px',
                                         boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
@@ -173,30 +198,31 @@ export const IntegralBasicaResolver = () => {
                                     }}
                                 />
                             )}
-                            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                <span
-                                    style={{ color: '#fff', fontSize: '20px', fontWeight: 'bold', marginBottom: '10px' }}
-                                >
-                                    Seleccione la respuesta
-                                </span>
+                            <span
+                                style={{color: '#fff', fontSize: '20px', fontWeight: 'bold', marginBottom: '10px'}}
+                            >
+            Seleccione la respuesta
+        </span>
+                            <div style={{display: 'flex', justifyContent: 'center'}}>
                                 {options.map((option, index) => (
                                     <div
                                         key={index}
-                                        onClick={() => handleOptionClick(index)}
+                                        onClick={() => handleOptionClick(option)}
                                         style={{
                                             cursor: 'pointer',
                                             margin: '10px',
                                             textAlign: 'center',
+                                            flexDirection: 'column',
                                             opacity: optionsDisabled ? 0.5 : 1,
                                             pointerEvents: optionsDisabled ? 'none' : 'auto',
                                         }}
                                     >
                                         <img
                                             src={option}
-                                            alt={`Opción ${index}`}
+                                            alt={`Opción ${index + 1}`}
                                             style={{
-                                                width: '100px',
-                                                height: '100px',
+                                                width: '100%',
+                                                height: '100%',
                                                 border: '2px solid #ccc',
                                                 borderRadius: '8px',
                                                 boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
@@ -214,17 +240,26 @@ export const IntegralBasicaResolver = () => {
                             </div>
                         </div>
                     </Col>
-                    <br />
+
+                    <br/>
                     <Col
                         md={6}
                         style={{
                             display: 'flex',
                             flexDirection: 'row',
                             flexWrap: 'wrap',
-                            justifyContent: 'flex-start',
+                            justifyContent: 'revert-layer-position',
                         }}
                     >
-                        <div>
+                        <div style={{
+                            backgroundColor: 'white',
+                            padding: '20px',
+                            borderRadius: '15px',
+                            boxShadow: '0 0 10px #ccc',
+                            width: '100%', // Establece un ancho fijo
+                            height: '500px', // Establece una altura fija
+                            overflowY: 'auto', // Agrega desplazamiento vertical si es necesario
+                        }}>
                             <h3>Procedimiento:</h3>
                             <ul
                                 style={{
@@ -238,22 +273,30 @@ export const IntegralBasicaResolver = () => {
                                     <li
                                         key={index}
                                         style={{
-                                            flex: '0 0 calc(33.33% - 10px)',
-                                            marginRight: '10px',
-                                            marginBottom: '10px',
+                                            flex: '0 0 calc(50% - 5px)',
+                                            marginRight: '5px',
+                                            marginBottom: '5px',
                                         }}
                                     >
                                         <img
                                             src={answer}
                                             alt={`Respuesta ${index + 1}`}
-                                            style={{ width: '100px', height: '100px' }}
+                                            style={{
+                                                maxWidth: '60%',
+                                                maxHeight: '70px',
+                                                borderRadius: '8px',
+                                                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+
+                                            }}
                                         />
                                     </li>
                                 ))}
                             </ul>
                         </div>
+
+
                     </Col>
-                    <div style={{ margin: '20px 0' }}></div>
+                    <div style={{margin: '20px 0'}}></div>
                     {showNextStepButton && (
                         <Button variant="primary" onClick={handleNextStepClick}>
                             Siguiente Paso
@@ -272,7 +315,7 @@ export const IntegralBasicaResolver = () => {
                                 <Button
                                     variant="danger"
                                     onClick={handleResetClick}
-                                    style={{ marginTop: '10px' }}
+                                    style={{marginTop: '10px'}}
                                 >
                                     Volver a intentar
                                 </Button>
@@ -280,7 +323,7 @@ export const IntegralBasicaResolver = () => {
                         </div>
                     )}
                 </Row>
-                <ToastContainer position="top-right" autoClose={2000} />
+                <ToastContainer position="top-right" autoClose={2000}/>
             </Container>
         </div>
     );
