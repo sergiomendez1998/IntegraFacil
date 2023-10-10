@@ -1,8 +1,10 @@
 import {HashRouter, Route, Routes} from "react-router-dom";
-import {NavBarApp} from "../components/NavBarApp.jsx";
-import {HomePage} from "../pages/HomePage.jsx";
-import {IntegralSustitucionResolver} from "../pages/sustitucion/IntegralSustitucionResolver.jsx";
-import {SustitucionTeoriaGeneral} from "../pages/sustitucion/teoria/SustitucionTeoriaGeneral.jsx";
+import {NavBarApp} from "../components/NavBarApp";
+import {HomePage} from "../pages/HomePage";
+import {IntegralSustitucionResolver} from "../pages/sustitucion/IntegralSustitucionResolver";
+import {SustitucionTeoriaGeneral} from "../pages/sustitucion/teoria/SustitucionTeoriaGeneral";
+import {IntegralBasicaTeoria} from "../pages/basica/IntegralBasicaTeoria";
+import {IntegralBasicaResolver} from "../pages/basica/IntegralBasicaResolver";
 
 export const AppRoutes = () => {
     return (
@@ -11,6 +13,10 @@ export const AppRoutes = () => {
                 <NavBarApp/>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
+                    <Route path="/Integrales/Basica/teoria" element={<IntegralBasicaTeoria/>} />
+                    <Route path="/Integrales/Basica/inicio" element={<IntegralBasicaResolver/>} />
+
+
                     <Route path="/Integrales/sustitucion/teoria" element={<SustitucionTeoriaGeneral/>} />
                     <Route path="/Integrales/Sustitucion/ejercicios" element={<IntegralSustitucionResolver/>} />
                 </Routes>

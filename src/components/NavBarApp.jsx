@@ -49,7 +49,7 @@ export const NavBarApp = () => {
                             Integrales</NavDropdown.Item>
                     </NavDropdown>
 
-                    <Link to="/Integrales/basica/teoria" style={sytleLink} > Integrales Basicas </Link>
+                    <Link to="/Integrales/Basica/teoria" style={sytleLink} > Integrales Basicas </Link>
                     <Link to="/Integrales/sustitucion/teoria" style={sytleLink} > Integrales por Sustitucion </Link>
                     <Link to="/Integrales/partes/teoria" style={sytleLink} > Integrales por partes </Link>
 

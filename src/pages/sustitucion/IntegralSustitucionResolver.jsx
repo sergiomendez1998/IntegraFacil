@@ -141,7 +141,7 @@ export const IntegralSustitucionResolver = () => {
         setShowResetButton(false);
     };
 
-    const nivelActual = currentProblem[userProgress.currentProblemIndex]?.nivel;
+    const nivelActual = currentStepData.nivel;
     const colorNivel = nivelColors[nivelActual] || 'black';
 
     return (
@@ -149,24 +149,27 @@ export const IntegralSustitucionResolver = () => {
             <Container>
                 <Row>
 
-                    <h1 style={{
-                        marginBottom: '20px',
-                        color: 'white',
-                        backgroundColor: '#132043',
-                        borderRadius: '15px',
-                        padding: '10px',
-                        boxShadow: '0 0 10px #ccc',
-                    }}>
-                        Ejercicio {userProgress.currentProblemIndex + 1} de {problems.length}{' '}
-                        <h3 style={{display: 'inline-block', marginLeft: '400px'}}>
-                            Nivel : {' '}
-                            {currentProblem && currentProblem[userProgress.currentProblemIndex] && (
-                                <span style={{color: colorNivel}}>
-        {nivelActual}
-      </span>
-                            )}
-                        </h3>
-                    </h1>
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '0', padding: '0' }}>
+                        <h1
+                            style={{
+                                marginBottom: '20px', // Add margin at the bottom
+                                color: 'white',
+                                backgroundColor: '#132043',
+                                borderRadius: '15px',
+                                padding: '10px',
+                                boxShadow: '0 0 10px #ccc',
+                                maxWidth: '1100px',
+                                margin: '0 auto',
+                                fontSize:'35px'// Center horizontally
+                            }}
+                        >
+                            Ejercicio {userProgress.currentProblemIndex + 1} de {problems.length}
+                            {' - '}  Sustitucion {' - '}
+                            Nivel : <span style={{ color: colorNivel }}>{nivelActual}</span>
+                        </h1>
+                    </div>
+
+                    <div style={{ marginBottom: '20px' }}></div>
 
 
                     <Col md={6}>

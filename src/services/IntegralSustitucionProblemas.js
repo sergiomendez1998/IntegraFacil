@@ -1,5 +1,5 @@
 const problems = [
-    //     nivel facil
+
     [
 
         {
