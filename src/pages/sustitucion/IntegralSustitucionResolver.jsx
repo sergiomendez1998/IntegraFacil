@@ -51,26 +51,23 @@ export const IntegralSustitucionResolver = () => {
                     position: 'top-right',
                     autoClose: 2000,
                 });
-
-                // Almacenar tanto la imagen de la respuesta correcta como la imagen del problema
+                
                 setCorrectAnswersHistory([...correctAnswersHistory, currentStepData.problemImage, selectedOption]);
-
-                // Mostrar el botón "Siguiente Paso" solo después de una respuesta correcta
                 setShowNextStepButton(true);
             } else {
-                // Respuesta incorrecta
+                
                 toast.error('Respuesta incorrecta', {
                     position: 'top-right',
                     autoClose: 2000,
                 });
 
-                // Mostrar el consejo correspondiente al paso actual
+                
                 setCurrentConsejo(currentStepData.consejo);
                 setConsejoVisible(true);
                 setShowResetButton(true);
             }
 
-            // Bloquear las opciones después de la selección
+            
             setOptionsDisabled(true);
             setSelectionMade(true);
         }
@@ -92,14 +89,14 @@ export const IntegralSustitucionResolver = () => {
             });
         } else {
             if (userProgress.currentProblemIndex < problems.length - 1) {
-                // Si hay más ejercicios en la lista, muestra "Siguiente Ejercicio"
+                
                 Swal.fire({
                     icon: 'success',
                     title: 'Felicitaciones',
                     text: 'Has completado el ejercicio correctamente.',
                     showCancelButton: true,
                     confirmButtonText: 'Siguiente Ejercicio',
-                    cancelButtonText: 'Menu Principal',
+                    cancelButtonText: 'Home',
                 }).then((result) => {
                     if (result.isConfirmed) {
                         setCorrectAnswersHistory([]);
@@ -109,19 +106,19 @@ export const IntegralSustitucionResolver = () => {
                             currentStep: 0,
                         });
                     } else {
-                        // Redirigir a la página de inicio
+                        
                         window.location.href = '/';
                     }
                 });
             } else {
-                // Si es el último ejercicio en la lista, muestra "Regresar a Home"
+               
                 Swal.fire({
                     icon: 'success',
                     title: 'Felicitaciones',
                     text: 'Has completado todos los ejercicios correctamente.',
                     confirmButtonText: 'Ok',
                 }).then(() => {
-                    // Redirigir a la página de inicio
+                   
                     window.location.href = '/';
                 });
             }
@@ -176,7 +173,7 @@ export const IntegralSustitucionResolver = () => {
                         <div
                             style={{
                                 display: 'flex',
-                                flexDirection: 'column', // Cambiar la dirección de la disposición a vertical
+                                flexDirection: 'column', 
                                 alignItems: 'center',
                                 backgroundColor: '#132043',
                                 borderRadius: '15px',
@@ -190,7 +187,7 @@ export const IntegralSustitucionResolver = () => {
                                     alt="Problema"
                                     style={{
                                         width: '70%',
-                                        height: 'auto', // Cambiar la altura a automático para que se ajuste proporcionalmente
+                                        height: 'auto', 
                                         border: '2px solid #ccc',
                                         borderRadius: '8px',
                                         boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
@@ -198,11 +195,9 @@ export const IntegralSustitucionResolver = () => {
                                     }}
                                 />
                             )}
-                            <span
-                                style={{color: '#fff', fontSize: '20px', fontWeight: 'bold', marginBottom: '10px'}}
-                            >
-            Seleccione la respuesta
-        </span>
+                            
+                            <span style={{color: '#fff', fontSize: '20px', fontWeight: 'bold', marginBottom: '10px'}}> Seleccione la respuesta</span>
+
                             <div style={{display: 'flex', justifyContent: 'center'}}>
                                 {options.map((option, index) => (
                                     <div
@@ -256,9 +251,9 @@ export const IntegralSustitucionResolver = () => {
                             padding: '20px',
                             borderRadius: '15px',
                             boxShadow: '0 0 10px #ccc',
-                            width: '100%', // Establece un ancho fijo
-                            height: '500px', // Establece una altura fija
-                            overflowY: 'auto', // Agrega desplazamiento vertical si es necesario
+                            width: '100%', 
+                            height: '500px', 
+                            overflowY: 'auto', 
                         }}>
                             <h3>Procedimiento:</h3>
                             <ul
@@ -293,7 +288,6 @@ export const IntegralSustitucionResolver = () => {
                                 ))}
                             </ul>
                         </div>
-
 
                     </Col>
                     <div style={{margin: '20px 0'}}></div>
